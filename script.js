@@ -210,43 +210,149 @@
 //         return colorScale(d.total);
 //       })
 // })
+
 const margin = { top: 10, right: 10, bottom: 10, left: 10 }
   width =1000 - margin.left - margin.right,
-  height = 600 - margin.top - margin.bottom;
-document.addEventListener("DOMContentLoaded", function() {
-const svg = d3
-  // .select("#chart")
-  .select("body").append("svg")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-  .attr("transform", `translate(${margin.left}, ${margin.top})`)
-  .attr("border", "1px solid black");
+  height = 900 - margin.top - margin.bottom;
+// document.addEventListener("DOMContentLoaded", function() {
+// const svg = d3
+//   .select("body").append("svg")
+//   .attr("width", width + margin.left + margin.right)
+//   .attr("height", height + margin.top + margin.bottom)
+//   .append("g")
+//   .attr("transform", `translate(${margin.left}, ${margin.top})`)
+//   .attr("border", "1px solid black");
 
-  console.log(svg)
-// Map and projection
-// const projection = d3.geoMercator()
-    // .scale(width / 1.3 / Math.PI)
-    // .translate([width / 2, height / 2])
+//   console.log(svg)
 
-// Load external data and boot
+// // Load external data and boot
+// d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
+// console.log(us)
+
+  
+// const path = d3.geoPath();
+  
+// const projection = d3.geoAlbersUsa()
+//   .fitSize([width, height], us);
+//     // Draw the map
+//     svg.append("g")
+//     .selectAll("path")
+//     .data(topojson.feature(us, us.objects.states).features)
+//         .join("path")
+//         .attr("d", path)
+//         .attr("fill", d => {
+//           // Replace this with your own data value to color mapping
+//           return "steelblue";
+//         });
+// });
+// });
+// d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
+//   // create a path generator
+//   var path = d3.geoPath();
+
+//   // create the map container
+//   var svg = d3.select("body").append("svg")
+//       .attr("width", width)
+//       .attr("height", height);
+// d3.csv("ab_counties.csv").then(function(data) {
+//   // var statusByCounty = d3.rollup(data,
+//   //   v => v[0].legal_status,
+//   //   d => d.fips
+    
+//   // );
+//   // console.log(statusByCounty)
+//         // create a map of legal status by state
+//         var statusByState = d3.rollup(data, 
+//           v => v[0].legal_status, 
+//           d => d.region
+//         );
+//         console.log(statusByState)
+
+//           // create a map of legal status by county
+
+//     // var statusByCounty = d3.rollup(data,
+//     //   v => v[0].legal_status,
+//     //   d => d.county
+//     // );
+
+//     // console.log(statusByCounty)
+//     // color
+
+//   const myColor = d3.scaleOrdinal()
+//     .domain(["Legal", "Illegal", "Six-Week Ban"])
+//     .range(["#231123", "#558c8c", "#82204a"]);
+
+//   // create the US map
+//   svg.append("g")
+//       .attr("class", "states")
+//       .selectAll("path")
+//       .data(topojson.feature(us, us.objects.states).features)
+//       .enter().append("path")
+//       .attr("d", path)
+//       // .style("fill", d => myColor(d.legal_status))
+//       .style("fill", function(d) {
+//         // var legalStatus = statusByState.get(d.properties.name);
+//         // return legalStatus ? myColor(legalStatus) : "#ccc";
+//         // return myColor(statusByState.get(d.properties.name));
+//         var stateName = d.properties.name;
+//         var status = statusByState.get(stateName);
+//         return myColor(status);
+//       });
+
+//   // create the US map
+//   // svg.append("g")
+//   // .attr("class", "counties")
+//   // .selectAll("path")
+//   // .data(topojson.feature(us, us.objects.counties).features)
+//   // .enter().append("path")
+//   // .attr("d", path)
+//   // .style("fill", function(d) {
+//   // //   var countyName = d.properties.name;
+//   // // var status = statusByCounty.get(countyName);
+//   // // return status ? myColor(status) : "#ccc";
+//   // var countyName = d.properties.name;
+//   // var status = statusByCounty.get(countyName);
+//   // return status ? myColor(status) : "#ccc";
+//   // });
+//   });
+// });
 d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
-console.log(us)
+  // create a path generator
+  var path = d3.geoPath();
 
+  // create the map container
+  var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+  d3.csv("ab_counties.csv").then(function(data) {
   
-const path = d3.geoPath();
-  
-const projection = d3.geoAlbersUsa()
-  .fitSize([width, height], us);
-    // Draw the map
+    // create a map of legal status by county fips code
+    var statusByFips = d3.rollup(data, 
+      // v => v.legal_status, 
+      v => v[0].legal_status,
+      d => d.origin_fips_code
+    );
+    console.log(statusByFips);
+
+    // color
+    const myColor = d3.scaleOrdinal()
+      .domain(["Legal", "Illegal", "Six-Week Ban"])
+      .range(["#231123", "#558c8c", "#82204a"]);
+
+    // create the US map
     svg.append("g")
-    .selectAll("path")
-    .data(topojson.feature(us, us.objects.states).features)
-        .join("path")
+        .attr("class", "counties")
+        .selectAll("path")
+        .data(topojson.feature(us, us.objects.counties).features)
+        .enter().append("path")
         .attr("d", path)
-        .attr("fill", d => {
-          // Replace this with your own data value to color mapping
-          return "steelblue";
+        .style("fill", function(d) {
+          var fips = d.id;
+          var status = statusByFips.get(fips);
+          return myColor(status);
         });
+  });
 });
-});
+
+
