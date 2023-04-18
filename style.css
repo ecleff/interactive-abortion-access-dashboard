@@ -1,19 +1,19 @@
 /* a minimalist set of CSS resets */
-@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;900&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;900&display=swap");
 * {
   box-sizing: border-box;
   font-size: 16px;
   font-family: "Lato", sans-serif;
  /*sans-serif is the "fallback font"
 /*   fhref="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" */
-}
-[hidden] {
+/* } */ 
+/* [hidden] {
   display: none !important;
-}
+} */
 
 
 /* default to border-box */
-html {
+/* html {
   box-sizing: border-box;
   font-size: 16px;
 }
@@ -23,23 +23,23 @@ html {
 }
 
 /* adjust typography defaults */
-body {
+/* body {
   margin: 10px;
   font-family: sans-serif;
   line-height: 1.5;
   background-color: white;
   color: black;
   width: 900px;
-}
+} */
 
 
 /* moving the vega bind to the top of the graph */
 
-.vega-bindings {
+/* .vega-bindings {
   position: absolute;
   top: -50px;
   margin: 10px
-}
+} */
 
 /* images and videos max out at full width */
 
@@ -100,7 +100,7 @@ img {
 
 
 /* OPTION 2 */
-img {
+/* img {
   width: 300px;
   position: absolute;
   top: 80px;
@@ -114,8 +114,8 @@ img {
   margin: 0 auto;
   margin-top: 200px;
   width: 200px;
-}
-
+} */
+/* 
 .container {
   background-color: #eeeeee;
   position: relative;
@@ -141,4 +141,47 @@ img {
 .main-text {
   margin:60px;
 }
+  */
 
+  .continent {
+    /* fill: #ededed; */
+    stroke: #d0d0d0;
+    stroke-width: 0.8;
+  }
+  
+  .dark-continent {
+    fill: #eeeeee;
+    stroke: #bbbbbb;
+  }
+  
+  .graticule {
+    stroke: rgb(222, 222, 222);
+    stroke-width: 0.5;
+  }
+  
+  .grid {
+    fill: none;
+    stroke: #333;
+  }
+  
+  .circles {
+      stroke: #555155;
+  }
+  
+  .c2 {
+    stroke-width: 0.5;
+  }
+  
+  .non-c2 {
+    stroke-width: 0.5
+  }
+  
+  .diamonds {
+      stroke-width: 0;
+  }
+  
+  .labels {
+    font-family: sans-serif;
+    font-size: 12px;
+    /* fill: #3c373d; */
+  }
