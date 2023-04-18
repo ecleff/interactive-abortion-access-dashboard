@@ -1,127 +1,67 @@
-/* a minimalist set of CSS resets */
-/* @import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@400;900&display=swap");
 * {
   box-sizing: border-box;
   font-size: 16px;
   font-family: "Lato", sans-serif;
- /*sans-serif is the "fallback font"
+  /*sans-serif is the "fallback font"
 /*   fhref="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&display=swap" */
-/* } */ 
-/* [hidden] {
-  display: none !important;
-} */
+}
 
+[hidden] {
+  display: none !important;
+}
 
 /* default to border-box */
-/* html {
+html {
   box-sizing: border-box;
   font-size: 16px;
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 
 /* adjust typography defaults */
-/* body {
+body {
   margin: 10px;
-  font-family: sans-serif;
+  font-family: "Lato";
   line-height: 1.5;
   background-color: white;
   color: black;
-  width: 900px;
-} */
-
-
-/* moving the vega bind to the top of the graph */
-
-/* .vega-bindings {
-  position: absolute;
-  top: -50px;
-  margin: 10px
-} */
-
-/* images and videos max out at full width */
-
-
-
-
-/* .container {
-  border: 1px solid black;
-  position: relative;
-  background-color: #eee;
-  height: 400px;
-}
-
-img {
-  position: absolute;
-  top: 100px;
-  left: 200px;
-}
-
-.right-text {
-  position: relative;
-  text-align: center;
-  line-height: 400px;
-  border: 1px solid green;
-  margin-top: 0px;
-} */
-
-
-
-
-
-
-/* img {
-  width: 300px;
-  position: absolute;
-  left: 100px;
-  top: 50px
-  
-}
-
-.right-text {
-  position: absolute;
-  left: 150px;
-  top: 120px;
-  border: 1px solid green;
-  display: inline;
-  text-align: center;
-  width: 200px;
+  width: 950px;
 }
 
 .container {
   background-color: #eeeeee;
   position: relative;
   border: 1px solid black;
-  height: 400px;
-  width: 600px;
-} */
-
-
-/* OPTION 2 */
-/* img {
-  width: 300px;
-  position: absolute;
-  top: 80px;
-  left: 140px
 }
 
-.right-text {
+.image {
+  margin-left: 10px;
   position: relative;
-  border: 1px solid green;
-  text-align: center;
-  margin: 0 auto;
-  margin-top: 200px;
-  width: 200px;
-} */
-/* 
-.container {
-  background-color: #eeeeee;
-  position: relative;
+}
+/*  creating flex boxes for the description section. 1 parent box and 2 children boxes. The parent box is the overall box containing all of the content above the canvas.*/
+.flex-container {
+  display: flex;
+  /*   border: 2px solid black; */
+  max-width: 1000px;
   border: 1px solid black;
-  height: 400px;
-  width: 600px;
+  margin: 20px;
+}
+/*  this child box is for the left side of the canvas containing the image and the caption*/
+#flex-container .side1 {
+  flex: 1 1 0;
+  flex-wrap: wrap;
+}
+/*  this child box is for the right side of the canvas with the intro paragraphs and legend*/
+
+#flex-container .side2 {
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  flex-grow: 0;
 }
 .title {
   font-family: "Lato", sans-serif;
@@ -129,59 +69,37 @@ img {
   font-weight: bold;
   font-size: 40px;
   line-height: 105%;
-  margin: 60px;
+  margin: 20px;
   position: relative;
+  color: black;
 }
 
-#vis {
-  margin: 50px;
-  display: flex;
+.heading {
+  font-size: 24px;
+  margin: 20px;
+}
+
+.sub-heading {
+  font-family: "Lato", sans-serif;
+  font-style: 900;
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 105%;
+  margin: 20px;
+  position: relative;
+  color: black;
 }
 
 .main-text {
-  margin:60px;
+  margin: 20px;
+  font-family: "Lato", sans-serif;
 }
-  */
+.legend-text {
+  font-size: 10px;
+  margin-left: 150px;
+}
 
-  .continent {
-    /* fill: #ededed; */
-    stroke: #d0d0d0;
-    stroke-width: 0.8;
-  }
-  
-  .dark-continent {
-    fill: #eeeeee;
-    stroke: #bbbbbb;
-  }
-  
-  .graticule {
-    stroke: rgb(222, 222, 222);
-    stroke-width: 0.5;
-  }
-  
-  .grid {
-    fill: none;
-    stroke: #333;
-  }
-  
-  .circles {
-      stroke: #555155;
-  }
-  
-  .c2 {
-    stroke-width: 0.5;
-  }
-  
-  .non-c2 {
-    stroke-width: 0.5
-  }
-  
-  .diamonds {
-      stroke-width: 0;
-  }
-  
-  .labels {
-    font-family: sans-serif;
-    font-size: 12px;
-    /* fill: #3c373d; */
-  }
+#chart{
+  width: 100%;
+  height: 100vh;
+} 
