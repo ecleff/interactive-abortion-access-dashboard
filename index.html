@@ -7,8 +7,21 @@
     
 <script src="script.js"></script>
 <body>
-  <h1> Interactive dashboard</h1>
-    <div id="chart"></div>
+  <h1 class="title"> The State of Abortion Access in Post-Roe America</h1>
+  <form id="filter-form">
+    <label>
+      <input type="checkbox" name="legal-status" value="Legal" checked>
+      Legal
+    </label>
+    <label>
+      <input type="checkbox" name="legal-status" value="Illegal" checked>
+      Illegal
+    </label>
+    <label>
+      <input type="checkbox" name="legal-status" value="Six-Week Ban" checked>
+      Six-Week Ban
+    </label>
+  </form>
     <div class="tooltip"></div>
 </body>
 

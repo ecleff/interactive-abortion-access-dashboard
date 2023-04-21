@@ -2,12 +2,13 @@
 
 const margin = { top: 10, right: 10, bottom: 10, left: 10 }
   width =1000 - margin.left - margin.right,
-  height = 900 - margin.top - margin.bottom;
+  height = 800 - margin.top - margin.bottom;
 
 
+// counties
 d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
-  // create a path generator
-  var path = d3.geoPath();
+
+
 
   // create the map container
   var svg = d3.select("body").append("svg")
@@ -48,20 +49,23 @@ d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
 console.log(countyMap.get('01001').lat);
 
   // projection
-    // define the projection
-// define the projection
+ 
 var projection = d3.geoAlbersUsa()
-    .scale(1200) // increase the scale to zoom in
-    .translate([width / 2, height / 2 + 50]) // move the center down by 50 pixels
+    .scale(2) // increase the scale to zoom in
+    .translate([width, height + 50]) // move the center down by 50 pixels
     // .rotate([96, 0]); // rotate the map to center it on the southern part of the US
+    console.log(projection)
+// var path = d3.geoPath().projection(projection);
 
-
-console.log(projection)
-  
+    var path = d3.geoPath();
     // color
     const myColor = d3.scaleOrdinal()
       .domain(["Legal", "Illegal", "Six-Week Ban"])
       .range(["#7294b7", "#863233", "#d38889"]);
+
+// checkbox
+// add checkboxes for each legal status option
+
 
     // create the US map
 us_map =    svg.append("g")
@@ -75,129 +79,117 @@ us_map =    svg.append("g")
           var status = statusByFips.get(fips);
           return myColor(status);
         });
+        
+// Define a function to update the map based on the selected checkboxes
 
 
-// testing tooltip stuff
-// create a path generator
-
-var tooltip = d3.select("body")
-    .append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
-us_map.on("mouseover", function(d) {
-      tooltip.transition()
-          .duration(200)
-          .style("opacity", .9);
-      tooltip.html( 
-        "Legal Status: " + statusByFips.get(d.id))
-          .style("left", event.pageX + 10 + "px")
-          .style("top", event.pageY + 10 + "px");
-    })
-    
-us_map.on("mouseout", function(d) {
-      tooltip.transition()
-          .duration(500)
-          .style("opacity", 0);
-    })
-    
-
-// add mouseover event to the county map
-
-
-      // create a new g element for the bubble plot
-
-
-// radius range
-var circleRadiusRange = [3, 10];
-
-// Define the logarithmic scale for the domain of avg_distance
-var distanceScale = d3.scaleLog()
-  .domain(d3.extent(data, function(d) { return d.avg_distance; }))
-  .range(circleRadiusRange);
-  
-// create the circle elements
-// create the circle elements
-// create circles for each county
-// svg.append("g")
-//   .attr("class", "circles")
-//   .selectAll("circle")
-//   .data(countyMap)
-//   .enter().append("circle")
-//     .attr("cx", function(d) { return projection([d[1].lng, d[1].lat])[0]; })
-//     .attr("cy", function(d) { return projection([d[1].lng, d[1].lat])[1]; })
-//     .attr("r", function(d) { return distanceByFips.get(d[0]); })
-//     .style("fill", "red")
-//     .style("opacity", 0.5);
-function updateCircles(data, scale = 1) {
-  // draw dots for each earthquake
-  var circs = svg.append("g")
-      .selectAll('circle')
-      .data(data)
-      .join('circle')
-      .style("stroke-width", 2 / scale)
-      .style("stroke", "gray")
-      .attr("fill-opacity", 0.5)
-      .attr("fill", "orange")
-      .attr("cx", function (d) {
-        var coords = countyMap.get(d.origin_fips_code);
-          // console.log(projection([coords.lng, coords.lat]))
-          return coords.lng
-      })
-      .attr("cy", function (d) { 
-        var coords = countyMap.get(d.origin_fips_code);
-        return coords.lat })
-      .attr("r", function (d) {
-          return distanceScale(d.avg_distance) / (scale / 1.2);
-      })
+function updateMap() {
+  // Get the selected checkbox values
+  var selectedValues = Array.from(document.querySelectorAll('input[name="legal-status"]:checked'))
+    .map(function(input) { return input.value; });
+  // Update the map fill colors based on the selected values
+  us_map.style("fill", function(d) {
+    var fips = d.id;
+    var status = statusByFips.get(fips);
+    if (selectedValues.includes(status)) {
+      return myColor(status);
+    } else {
+      return "#ccc"; // Use a gray color for unselected values
     }
-    updateCircles(data);
+  });
+  const filteredData = data.filter(d => selectedValues.includes(d.legal_status));
+  // console.log(filteredData)
+  updateSecondGraph(filteredData);
+}
 
+// Add event listeners to the checkbox inputs to update the map
+document.querySelectorAll('input[name="legal-status"]').forEach(function(input) {
+  input.addEventListener("change", updateMap);
+});
 
+// Initialize the map with all checkboxes selected
+updateMap();
+// const svg2 = d3.select("body")
+//   .append("svg")
+//   .attr("width", width + margin.left + margin.right)
+//   .attr("height", height + margin.top + margin.bottom)
+//   .append("g")
+//   .attr("transform",
+//         "translate(" + margin.left + "," + margin.top + ")");
 
-
-// create circles for each county
-// svg.selectAll("circle")
-//   .data(data)
-//   .join("circle")
-//   .attr("cx", function(d) {
-//     var coords = countyMap.get(d.key);
-//     if (!coords) {
-//       return null;
-//     }
-//     return projection([coords.lng, coords.lat])[0];
-//   })
-//   .attr("cy", function(d) {
-//     var coords = countyMap.get(d.key);
-//     if (!coords) {
-//       return null;
-//     }
-//     return projection([coords.lng, coords.lat])[1];
-//   })
-//   .attr("r", 9
-//   // function(d) {
-//   //   return distanceScale(d.value.avg_distance);
-//   // }
-//   )
+function updateSecondGraph(filteredData) {
+  // Get the unique set of states from the filtered data
+  const states = new Set(filteredData.map(d => d.state_name));
   
-  // .attr("cx", function(d) {
-  //   var coords = countyMap.get(d.origin_fips_code);
-  //   console.log(coords);
-  //   return projection([coords.lng, coords.lat])[0];
-  // })
-  // .attr("cy", function(d) {
-  //   var coords = countyMap.get(d.origin_fips_code);
-  //   console.log(coords);
-  //   return projection([coords.lng, coords.lat])[1];
-  // })
-  // .attr("r", 9
-  // // function(d) {
-  // //   return distanceScale(countyMap.get(d.key).avg_distance);
-  // // }
-  // )
-  // .style("fill", "white")
-  // .style("fill-opacity", 0.5)
-  // .style("stroke", "black")
-  // .style("stroke-opacity", 0.5);
+  // Define the dimensions of each chart
+  const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+  const width = 200 - margin.left - margin.right;
+  const height = 150 - margin.top - margin.bottom;
+  
+  // Loop through each state and create a small multiples bar chart
+  states.forEach(state => {
+    // Filter the data for the current state
+    const stateData = filteredData.filter(d => d.state_name === state);
+    console.log(stateData)
+    // Create a new SVG element for the current state chart
+    // const svg2 = d3.select(`#${state.toLowerCase()}-chart`)
+    //   .attr("width", width + margin.left + margin.right)
+    //   .attr("height", height + margin.top + margin.bottom)
+    //   .append("g")
+    //   .attr("transform", `translate(${margin.left}, ${margin.top})`);
+    const svg2 = d3.select("body")
+  .append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+    
+    // Define the x and y scales
+    const xScale = d3.scaleBand()
+      .domain(stateData.map(d => d.county))
+      .range([0, width])
+      .padding(0.1);
+    const yScale = d3.scaleLinear()
+      .domain([0, d3.max(stateData, d => +d.avg_distance)])
+      .range([height, 0]);
+    
+    // Draw the x and y axes
+    const xAxis = d3.axisBottom(xScale);
+    const yAxis = d3.axisLeft(yScale);
+    svg2.append("g")
+      .attr("transform", `translate(0, ${height})`)
+      .call(xAxis)
+      .selectAll("text")
+      .attr("y", 0)
+      .attr("x", 9)
+      .attr("dy", ".35em")
+      .attr("transform", "rotate(90)")
+      .style("text-anchor", "start");
+    svg2.append("g")
+      .call(yAxis)
+      .append("text")
+      .attr("fill", "#000")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Avg Distance");
+    
+    // Draw the bars
+    svg2.selectAll(".bar")
+      .data(stateData)
+      .enter()
+      .append("rect")
+      .attr("class", "bar")
+      .attr("x", d => xScale(d.county))
+      .attr("y", d => yScale(+d.avg_distance))
+      .attr("width", xScale.bandwidth())
+      .attr("height", d => height - yScale(+d.avg_distance))
+      .attr("fill", "steelblue");
+  });
+}
+
 
 
   });
