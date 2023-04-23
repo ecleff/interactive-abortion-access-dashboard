@@ -28,16 +28,16 @@ body {
   margin: 10px;
   font-family: "IBM Plex Sans";
   line-height: 1.5;
-  background-color: white;
-  color: black;
+  background-color: #2B1212;
+  color: white;
   /* width: 950px; */
 }
 
-.container {
+/* .container {
   background-color: #eeeeee;
   position: relative;
   border: 1px solid black;
-}
+} */
 
 .image {
   margin-left: 10px;
@@ -50,6 +50,7 @@ body {
   max-width: 1000px;
   border: 1px solid black;
   margin: 20px;
+  padding:20px;
 }
 /*  this child box is for the left side of the canvas containing the image and the caption*/
 #flex-container .side1 {
@@ -71,7 +72,7 @@ body {
   line-height: 105%;
   margin: 20px;
   position: relative;
-  color: black;
+  color: white;
 }
 
 .heading {
@@ -109,8 +110,20 @@ body {
   position: fixed; */
   position: absolute;
   padding: 10px;
-  background-color: #fff;
+  /* background-color: #fff; */
   /* border: 1px solid #000; */
   border-radius: 5px;
   pointer-events: none;
+}
+
+.chart-container {
+  position: absolute;
+  top: 50px;
+  left: 800px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-div {
+  margin-bottom: 10px;
 }
