@@ -15,7 +15,7 @@ d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
       .attr("width", width)
       .attr("height", height);
 
-  d3.csv("ab_counties.csv").then(function(data) {
+  d3.csv("all_yrs_counties.csv").then(function(data) {
  
     // create a map of legal status by county fips code
     var statusByFips = d3.rollup(data, 
@@ -68,7 +68,7 @@ console.log(path)
     // color
 const myColor = d3.scaleOrdinal()
       .domain(["Legal", "Illegal", "Six-Week Ban"])
-      .range(["#7294b7", "#863233", "#d38889"]);
+      .range(["#7294b7", "#99514D", "#d38889"]);
 
 
     // create the US map
@@ -78,6 +78,9 @@ us_map =    svg.append("g")
         .data(topojson.feature(us, us.objects.counties).features)
         .enter().append("path")
         .attr("d", path)
+        .style("stroke", "grey")
+        .style("stroke-width", "0.2px")
+        // .style("op")
         .style("fill", function(d) {
           var fips = d.id;
           var status = statusByFips.get(fips);
