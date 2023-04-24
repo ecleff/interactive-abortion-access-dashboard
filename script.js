@@ -11,11 +11,11 @@ d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
 
 
   // create the map container
-  var svg = d3.select("body").append("svg")
+  var svg = d3.select("#chart").append("svg")
       .attr("width", width)
       .attr("height", height);
 
-  d3.csv("all_yrs_counties.csv").then(function(data) {
+  d3.csv("https://raw.githubusercontent.com/ecleff/interactive-abortion-access-dashboard/main/test.csv").then(function(data) {
  
     // create a map of legal status by county fips code
     var statusByFips = d3.rollup(data, 
@@ -124,6 +124,12 @@ document.getElementById("legal-status").addEventListener("change", updateMap);
 // Initialize the map with all selected
 updateMap();
 
+// update graphs below map
+
+
+
+
+
 function updateSecondGraph(filteredData, selectedValue) {
   filteredData.forEach(function (d) {
     d["population"] = +d["population"];
@@ -133,7 +139,8 @@ function updateSecondGraph(filteredData, selectedValue) {
   console.log(filteredData)
 
  // Get the unique set of legal statuses from the filtered data
- const legalStatuses = new Set(filteredData.map(d => d.legal_status));
+ const legalStatuses = new Set(["all", ...filteredData.map(d => d.legal_status)]);
+
   
  // Only show the line chart if "all" is selected
  if (selectedValue === "all") {
@@ -187,91 +194,165 @@ function updateSecondGraph(filteredData, selectedValue) {
      .attr("stroke-width", 2)
      .attr("d", line);
  } else {
-   // If a specific legal status is selected, show the small multiples bar chart
-  //  ...
-  //    Get the unique set of states from the filtered data
-  const states = new Set(filteredData.map(d => d.state_name));
+
+  // If a specific legal status is selected, show the scatter plot
+// const filteredData = data.filter(d => selectedValue.includes(d.legal_status));
+  // Create a new SVG element to hold the scatterplot
+// const scatterPlot = d3.select("body")
+// .append("svg")
+// .attr("width", 800)
+// .attr("height", 600);
+
+// Create an array of objects for the scatterplot
+const scatterData = filteredData.map(d => {
+return {
+  x: +d.population,
+  y: +d.avg_distance,
+  legal_status: d.legal_status
+};
+});
+
+
+const scatterDiv = d3.select("#scatter-plot-container")
+// Remove any existing scatter plot
+scatterDiv.selectAll("*").remove();
+
+const scatterPlotWidth = 600;
+const scatterPlotHeight = 400;
+
+const scatterPlotSvg = scatterDiv
+  .append("svg")
+  .attr("width", scatterPlotWidth)
+  .attr("height", scatterPlotHeight);
+
   
-  // Define the dimensions of each chart
-  const margin = { top: 20, right: 20, bottom: 30, left: 50 };
-  const width = 200 - margin.left - margin.right;
-  const height = 150 - margin.top - margin.bottom;
+// Define the dimensions of the scatter plot
+const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+const width = scatterPlotWidth - margin.left - margin.right;
+const height = scatterPlotHeight - margin.top - margin.bottom;
+
+// Define the x and y scales
+const xScale = d3.scaleLinear()
+  .domain([0, d3.max(filteredData, d => +d.population)])
+  .range([0, width]);
+const yScale = d3.scaleLinear()
+  .domain([0, d3.max(filteredData, d => +d.avg_distance)])
+  .range([height, 0]);
 
 
+// Draw the x and y axes
+const xAxis = d3.axisBottom(xScale);
+const yAxis = d3.axisLeft(yScale);
+scatterPlotSvg.append("g")
+.attr("transform", `translate(0, ${height - margin.bottom})`)
+.call(xAxis);
+scatterPlotSvg.append("g")
+.attr("transform", `translate(${margin.left}, 0)`)
+.call(yAxis);
 
-  
-  // Loop through each state and create a small multiples bar chart
-  states.forEach(state => {
-    // Filter the data for the current state
-    const stateData = filteredData.filter(d => d.state_name === state);
-    // console.log(stateData)
-
-
-    const svg2 = d3.select("body")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
-
-        // svg2.selectAll("g").remove();
-        // svg2.selectAll("text").remove();
-
-        svg2.selectAll("*").remove();
-
-   
-    // Define the x and y scales
-    const xScale = d3.scaleBand()
-      .domain(stateData.map(d => d.county))
-      .range([0, width])
-      .padding(0.1);
-    const yScale = d3.scaleLinear()
-      .domain([0, d3.max(stateData, d => +d.avg_distance)])
-      .range([height, 0]);
-    
-    // Draw the x and y axes
-    const xAxis = d3.axisBottom(xScale);
-    const yAxis = d3.axisLeft(yScale);
-    svg2.append("g")
-      .attr("transform", `translate(0, ${height})`)
-      .call(xAxis)
-      .selectAll("text")
-      .attr("y", 0)
-      .attr("x", 9)
-      .attr("dy", ".35em")
-      .attr("transform", "rotate(90)")
-      .style("text-anchor", "start")
-      .style("font-size", "6px");
-    svg2.append("g")
-      .call(yAxis)
-      .append("text")
-      .selectAll("text")
-      .style("font-size", "6px")
-      .attr("fill", "#000")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", "0.71em")
-      .attr("text-anchor", "end")
-      .text("Avg Distance");
-    // color
       const myColor = d3.scaleOrdinal()
       .domain(["Legal", "Illegal", "Six-Week Ban"])
       .range(["#7294b7", "#863233", "#d38889"]);
-    // Draw the bars
-    svg2.selectAll(".bar")
-      .data(stateData)
-      .enter()
-      .append("rect")
-      .attr("class", "bar")
-      .attr("x", d => xScale(d.county))
-      .attr("y", d => yScale(+d.avg_distance))
-      .attr("width", xScale.bandwidth())
-      .attr("height", d => height - yScale(+d.avg_distance))
-      .attr("fill", d => myColor(d.legal_status));
-  });
+// Draw the scatterplot circles
+scatterPlotSvg.selectAll("circle")
+.data(scatterData)
+.enter()
+.append("circle")
+.attr("cx", d => xScale(d.x))
+.attr("cy", d => yScale(d.y))
+.attr("r", 3)
+.attr("fill", d => myColor(d.legal_status));
+
 
  }
+
+
+
+//  small multiples
+
+ // If a specific legal status is selected, show the small multiples bar chart
+  //  ...
+  //    Get the unique set of states from the filtered data
+  // const states = new Set(filteredData.map(d => d.state_name));
+  
+  // // Define the dimensions of each chart
+  // const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+  // const width = 200 - margin.left - margin.right;
+  // const height = 150 - margin.top - margin.bottom;
+
+
+
+  
+  // // Loop through each state and create a small multiples bar chart
+  // states.forEach(state => {
+  //   // Filter the data for the current state
+  //   const stateData = filteredData.filter(d => d.state_name === state);
+  //   // console.log(stateData)
+
+
+  //   const svg2 = d3.select("body")
+  //   .append("svg")
+  //   .attr("width", width + margin.left + margin.right)
+  //   .attr("height", height + margin.top + margin.bottom)
+  //   .append("g")
+  //   .attr("transform",
+  //         "translate(" + margin.left + "," + margin.top + ")");
+
+  //       // svg2.selectAll("g").remove();
+  //       // svg2.selectAll("text").remove();
+
+  //       svg2.selectAll("*").remove();
+
+   
+  //   // Define the x and y scales
+  //   const xScale = d3.scaleBand()
+  //     .domain(stateData.map(d => d.county))
+  //     .range([0, width])
+  //     .padding(0.1);
+  //   const yScale = d3.scaleLinear()
+  //     .domain([0, d3.max(stateData, d => +d.avg_distance)])
+  //     .range([height, 0]);
+    
+  //   // Draw the x and y axes
+  //   const xAxis = d3.axisBottom(xScale);
+  //   const yAxis = d3.axisLeft(yScale);
+  //   svg2.append("g")
+  //     .attr("transform", `translate(0, ${height})`)
+  //     .call(xAxis)
+  //     .selectAll("text")
+  //     .attr("y", 0)
+  //     .attr("x", 9)
+  //     .attr("dy", ".35em")
+  //     .attr("transform", "rotate(90)")
+  //     .style("text-anchor", "start")
+  //     .style("font-size", "6px");
+  //   svg2.append("g")
+  //     .call(yAxis)
+  //     .append("text")
+  //     .selectAll("text")
+  //     .style("font-size", "6px")
+  //     .attr("fill", "#000")
+  //     .attr("transform", "rotate(-90)")
+  //     .attr("y", 6)
+  //     .attr("dy", "0.71em")
+  //     .attr("text-anchor", "end")
+  //     .text("Avg Distance");
+  //   // color
+  //     const myColor = d3.scaleOrdinal()
+  //     .domain(["Legal", "Illegal", "Six-Week Ban"])
+  //     .range(["#7294b7", "#863233", "#d38889"]);
+  //   // Draw the bars
+  //   svg2.selectAll(".bar")
+  //     .data(stateData)
+  //     .enter()
+  //     .append("rect")
+  //     .attr("class", "bar")
+  //     .attr("x", d => xScale(d.county))
+  //     .attr("y", d => yScale(+d.avg_distance))
+  //     .attr("width", xScale.bandwidth())
+  //     .attr("height", d => height - yScale(+d.avg_distance))
+  //     .attr("fill", d => myColor(d.legal_status));
+  // });
   // const margin = { top: 20, right: 20, bottom: 30, left: 50 };
   // const width = 600 - margin.left - margin.right;
   // const height = 400 - margin.top - margin.bottom;
@@ -322,95 +403,6 @@ function updateSecondGraph(filteredData, selectedValue) {
   //   .attr("stroke", "steelblue")
   //   .attr("stroke-width", 2)
   //   .attr("d", line);
-
- 
-
-
-
-
-  // small multiples
-  // Get the unique set of states from the filtered data
-//   const states = new Set(filteredData.map(d => d.state_name));
-  
-//   // Define the dimensions of each chart
-//   const margin = { top: 20, right: 20, bottom: 30, left: 50 };
-//   const width = 200 - margin.left - margin.right;
-//   const height = 150 - margin.top - margin.bottom;
-
-
-
-  
-//   // Loop through each state and create a small multiples bar chart
-//   states.forEach(state => {
-//     // Filter the data for the current state
-//     const stateData = filteredData.filter(d => d.state_name === state);
-//     console.log(stateData)
-
-
-//     const svg2 = d3.select("body")
-//     .append("svg")
-//     .attr("width", width + margin.left + margin.right)
-//     .attr("height", height + margin.top + margin.bottom)
-//     .append("g")
-//     .attr("transform",
-//           "translate(" + margin.left + "," + margin.top + ")");
-
-//         // svg2.selectAll("g").remove();
-//         // svg2.selectAll("text").remove();
-
-//         svg2.selectAll("*").remove();
-
-   
-//     // Define the x and y scales
-//     const xScale = d3.scaleBand()
-//       .domain(stateData.map(d => d.county))
-//       .range([0, width])
-//       .padding(0.1);
-//     const yScale = d3.scaleLinear()
-//       .domain([0, d3.max(stateData, d => +d.avg_distance)])
-//       .range([height, 0]);
-    
-//     // Draw the x and y axes
-//     const xAxis = d3.axisBottom(xScale);
-//     const yAxis = d3.axisLeft(yScale);
-//     svg2.append("g")
-//       .attr("transform", `translate(0, ${height})`)
-//       .call(xAxis)
-//       .selectAll("text")
-//       .attr("y", 0)
-//       .attr("x", 9)
-//       .attr("dy", ".35em")
-//       .attr("transform", "rotate(90)")
-//       .style("text-anchor", "start")
-//       .style("font-size", "6px");
-//     svg2.append("g")
-//       .call(yAxis)
-//       .append("text")
-//       .selectAll("text")
-//       .style("font-size", "6px")
-//       .attr("fill", "#000")
-//       .attr("transform", "rotate(-90)")
-//       .attr("y", 6)
-//       .attr("dy", "0.71em")
-//       .attr("text-anchor", "end")
-//       .text("Avg Distance");
-//     // color
-//       const myColor = d3.scaleOrdinal()
-//       .domain(["Legal", "Illegal", "Six-Week Ban"])
-//       .range(["#7294b7", "#863233", "#d38889"]);
-//     // Draw the bars
-//     svg2.selectAll(".bar")
-//       .data(stateData)
-//       .enter()
-//       .append("rect")
-//       .attr("class", "bar")
-//       .attr("x", d => xScale(d.county))
-//       .attr("y", d => yScale(+d.avg_distance))
-//       .attr("width", xScale.bandwidth())
-//       .attr("height", d => height - yScale(+d.avg_distance))
-//       .attr("fill", d => myColor(d.legal_status));
-//   });
-// }
 
 }
 

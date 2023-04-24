@@ -116,14 +116,6 @@ body {
   pointer-events: none;
 }
 
-.chart-container {
-  position: absolute;
-  top: 50px;
-  left: 800px;
-  display: flex;
-  flex-direction: column;
-}
-
-.chart-div {
-  margin-bottom: 10px;
-}
+/* .chart{
+  width: 500px
+} */
