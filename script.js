@@ -91,19 +91,7 @@ us_map =    svg.append("g")
 
 
 function updateMap() {
-  // Get the selected checkbox values
-  // var selectedValues = Array.from(document.querySelectorAll('input[name="legal-status"]:checked'))
-  //   .map(function(input) { return input.value; });
-  // // Update the map fill colors based on the selected values
-  // us_map.style("fill", function(d) {
-  //   var fips = d.id;
-  //   var status = statusByFips.get(fips);
-  //   if (selectedValues.includes(status)) {
-  //     return myColor(status);
-  //   } else {
-  //     return "#ccc"; // Use a gray color for unselected values
-  //   }
-  // });
+
 
   var selectedValue = document.getElementById("legal-status").value;
   
@@ -117,38 +105,91 @@ function updateMap() {
       return "#ccc"; // Use a gray color for unselected values
     }
   });
-  
-  // Filter the data based on the selected value
-  // var filteredData;
-  // if (selectedValue === "all") {
-  //   filteredData = data;
-  // } else {
-  //   filteredData = data.filter(function(d) {
-  //     return d.legal_status === selectedValue;
-  //   });
-  // }
-  
 
-  const filteredData = data.filter(d => selectedValue.includes(d.legal_status));
-
-  // Clear the existing small multiples graphs
- 
+  // const filteredData = data.filter(d => selectedValue.includes(d.legal_status));
+  let filteredData = data;
+  if (selectedValue !== "all") {
+    filteredData = data.filter(d => selectedValue.includes(d.legal_status));
+  }
+ console.log(selectedValue)
  
   console.log(filteredData)
   updateSecondGraph(filteredData);
 }
 
-// Add event listeners to the checkbox inputs to update the map
-// document.querySelectorAll('input[name="legal-status"]').forEach(function(input) {
-//   input.addEventListener("change", updateMap);
-// });
+// Add event listeners to the inputs to update the map
+
 document.getElementById("legal-status").addEventListener("change", updateMap);
 
-// Initialize the map with all checkboxes selected
+// Initialize the map with all selected
 updateMap();
 
-function updateSecondGraph(filteredData) {
-  // Get the unique set of states from the filtered data
+function updateSecondGraph(filteredData, selectedValue) {
+  filteredData.forEach(function (d) {
+    d["population"] = +d["population"];
+    d["avg_distance"] = +d["avg_distance"];
+
+  });
+  console.log(filteredData)
+
+ // Get the unique set of legal statuses from the filtered data
+ const legalStatuses = new Set(filteredData.map(d => d.legal_status));
+  
+ // Only show the line chart if "all" is selected
+ if (selectedValue === "all") {
+   // Group the data by year and calculate the mean average distance
+   const dataByYear = d3.group(filteredData, d => d.year);
+   const meanData = Array.from(dataByYear, ([year, data]) => ({
+     year,
+     avg_distance: d3.mean(data, d => d.avg_distance)
+   }));
+
+   // Define the dimensions of the chart
+   const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+   const width = 500 - margin.left - margin.right;
+   const height = 300 - margin.top - margin.bottom;
+ 
+
+   console.log(dataByYear)
+   console.log(meanData)
+   // Select the SVG element and set its dimensions
+   const svg2 = d3.select("body")
+     .attr("width", width + margin.left + margin.right)
+     .attr("height", height + margin.top + margin.bottom)
+     .append("g")
+     .attr("transform", `translate(${margin.left}, ${margin.top})`);
+ 
+   // Define the x and y scales
+   const xScale = d3.scaleLinear()
+     .domain(d3.extent(meanData, d => +d.year))
+     .range([0, width]);
+   const yScale = d3.scaleLinear()
+     .domain([0, d3.max(meanData, d => +d.avg_distance)])
+     .range([height, 0]);
+ 
+   // Draw the x and y axes
+   const xAxis = d3.axisBottom(xScale).tickFormat(d3.format("d"));
+   const yAxis = d3.axisLeft(yScale);
+   svg2.append("g")
+     .attr("transform", `translate(0, ${height})`)
+     .call(xAxis);
+   svg2.append("g")
+     .call(yAxis);
+ 
+   // Draw the line
+   const line = d3.line()
+     .x(d => xScale(+d.year))
+     .y(d => yScale(+d.avg_distance));
+   svg2.append("path")
+     .datum(meanData)
+     .attr("fill", "none")
+     .attr("stroke", "steelblue")
+     .attr("stroke-width", 2)
+     .attr("d", line);
+ } else {
+   // If a specific legal status is selected, show the small multiples bar chart
+  //  ...
+  //    Get the unique set of states from the filtered data
   const states = new Set(filteredData.map(d => d.state_name));
   
   // Define the dimensions of each chart
@@ -163,7 +204,7 @@ function updateSecondGraph(filteredData) {
   states.forEach(state => {
     // Filter the data for the current state
     const stateData = filteredData.filter(d => d.state_name === state);
-    console.log(stateData)
+    // console.log(stateData)
 
 
     const svg2 = d3.select("body")
@@ -229,9 +270,149 @@ function updateSecondGraph(filteredData) {
       .attr("height", d => height - yScale(+d.avg_distance))
       .attr("fill", d => myColor(d.legal_status));
   });
+
+ }
+  // const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+  // const width = 600 - margin.left - margin.right;
+  // const height = 400 - margin.top - margin.bottom;
+
+  // // Remove any existing chart elements
+  // d3.select("#second-chart").selectAll("*").remove();
+
+  // // Create a new SVG element for the chart
+  // const svg2 = d3.select("body")
+  //   .append("svg")
+  //   .attr("width", width + margin.left + margin.right)
+  //   .attr("height", height + margin.top + margin.bottom)
+  //   .append("g")
+  //   .attr("transform", `translate(${margin.left},${margin.top})`);
+
+  // // Calculate the mean avg_distance for each year
+  // const meanData = d3.rollup(filteredData, v => d3.mean(v, d => d.avg_distance), d => d.year);
+
+  // // Convert the meanData map to an array of objects
+  // const meanDataArray = Array.from(meanData, d => ({ year: d[0], avg_distance: d[1] }));
+
+  // // Define the x and y scales
+  // const xScale = d3.scaleLinear()
+  //   .domain(d3.extent(meanDataArray, d => d.year))
+  //   .range([0, width]);
+  // const yScale = d3.scaleLinear()
+  //   .domain([0, d3.max(meanDataArray, d => d.avg_distance)])
+  //   .range([height, 0]);
+
+  // // Draw the x and y axes
+  // const xAxis = d3.axisBottom(xScale);
+  // const yAxis = d3.axisLeft(yScale);
+  // svg2.append("g")
+  //   .attr("transform", `translate(0,${height})`)
+  //   .call(xAxis);
+  // svg2.append("g")
+  //   .call(yAxis);
+
+  // // Define the line function
+  // const line = d3.line()
+  //   .x(d => xScale(d.year))
+  //   .y(d => yScale(d.avg_distance));
+
+  // // Draw the line chart
+  // svg2.append("path")
+  //   .datum(meanDataArray)
+  //   .attr("fill", "none")
+  //   .attr("stroke", "steelblue")
+  //   .attr("stroke-width", 2)
+  //   .attr("d", line);
+
+ 
+
+
+
+
+  // small multiples
+  // Get the unique set of states from the filtered data
+//   const states = new Set(filteredData.map(d => d.state_name));
+  
+//   // Define the dimensions of each chart
+//   const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+//   const width = 200 - margin.left - margin.right;
+//   const height = 150 - margin.top - margin.bottom;
+
+
+
+  
+//   // Loop through each state and create a small multiples bar chart
+//   states.forEach(state => {
+//     // Filter the data for the current state
+//     const stateData = filteredData.filter(d => d.state_name === state);
+//     console.log(stateData)
+
+
+//     const svg2 = d3.select("body")
+//     .append("svg")
+//     .attr("width", width + margin.left + margin.right)
+//     .attr("height", height + margin.top + margin.bottom)
+//     .append("g")
+//     .attr("transform",
+//           "translate(" + margin.left + "," + margin.top + ")");
+
+//         // svg2.selectAll("g").remove();
+//         // svg2.selectAll("text").remove();
+
+//         svg2.selectAll("*").remove();
+
+   
+//     // Define the x and y scales
+//     const xScale = d3.scaleBand()
+//       .domain(stateData.map(d => d.county))
+//       .range([0, width])
+//       .padding(0.1);
+//     const yScale = d3.scaleLinear()
+//       .domain([0, d3.max(stateData, d => +d.avg_distance)])
+//       .range([height, 0]);
+    
+//     // Draw the x and y axes
+//     const xAxis = d3.axisBottom(xScale);
+//     const yAxis = d3.axisLeft(yScale);
+//     svg2.append("g")
+//       .attr("transform", `translate(0, ${height})`)
+//       .call(xAxis)
+//       .selectAll("text")
+//       .attr("y", 0)
+//       .attr("x", 9)
+//       .attr("dy", ".35em")
+//       .attr("transform", "rotate(90)")
+//       .style("text-anchor", "start")
+//       .style("font-size", "6px");
+//     svg2.append("g")
+//       .call(yAxis)
+//       .append("text")
+//       .selectAll("text")
+//       .style("font-size", "6px")
+//       .attr("fill", "#000")
+//       .attr("transform", "rotate(-90)")
+//       .attr("y", 6)
+//       .attr("dy", "0.71em")
+//       .attr("text-anchor", "end")
+//       .text("Avg Distance");
+//     // color
+//       const myColor = d3.scaleOrdinal()
+//       .domain(["Legal", "Illegal", "Six-Week Ban"])
+//       .range(["#7294b7", "#863233", "#d38889"]);
+//     // Draw the bars
+//     svg2.selectAll(".bar")
+//       .data(stateData)
+//       .enter()
+//       .append("rect")
+//       .attr("class", "bar")
+//       .attr("x", d => xScale(d.county))
+//       .attr("y", d => yScale(+d.avg_distance))
+//       .attr("width", xScale.bandwidth())
+//       .attr("height", d => height - yScale(+d.avg_distance))
+//       .attr("fill", d => myColor(d.legal_status));
+//   });
+// }
+
 }
-
-
 
   });
 });
