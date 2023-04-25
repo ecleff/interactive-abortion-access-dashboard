@@ -102,7 +102,7 @@ function updateMap() {
     if (selectedValue === "all" || status === selectedValue) {
       return myColor(status);
     } else {
-      return "#ccc"; // Use a gray color for unselected values
+      return "#2B1212"; // Use a gray color for unselected values
     }
   });
 
@@ -211,7 +211,7 @@ return {
   legal_status: d.legal_status
 };
 });
-
+console.log(scatterData)
 
 const scatterDiv = d3.select("#scatter-plot-container")
 // Remove any existing scatter plot
@@ -228,29 +228,47 @@ const scatterPlotSvg = scatterDiv
   
 // Define the dimensions of the scatter plot
 const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+
 const width = scatterPlotWidth - margin.left - margin.right;
 const height = scatterPlotHeight - margin.top - margin.bottom;
 
 // Define the x and y scales
-const xScale = d3.scaleLinear()
-  .domain([0, d3.max(filteredData, d => +d.population)])
+  const xScale = d3.scaleLinear()
+  .domain([d3.min(scatterData, d => d.x), d3.max(scatterData, d => d.x)])
   .range([0, width]);
+
+  const formatNumber = d3.format(".2s");
+  scatterPlotSvg.append("g")
+  .attr("transform", `translate(0, ${height})`)
+  .call(d3.axisBottom(xScale).tickFormat(formatNumber))
+  .selectAll("text")
+    .attr("transform", "translate(-10,0)rotate(0)")
+    .style("text-anchor", "start")
+    .style("font-size", "12px");
+    scatterPlotSvg.append("text")
+  .attr("text-anchor", "end")
+  .attr("x", width)
+  .attr("y", height+45 )
+  .text("population");
+
 const yScale = d3.scaleLinear()
-  .domain([0, d3.max(filteredData, d => +d.avg_distance)])
+  .domain([d3.min(scatterData, d => d.y), d3.max(scatterData, d => d.y)])
   .range([height, 0]);
+  scatterPlotSvg.append("g")
+    .call(d3.axisLeft(yScale).ticks(5))
+    .selectAll("text")
+    .style("font-size", "12px");
+
+    scatterPlotSvg.append("text")
+    .attr("text-anchor", "end")
+    .attr("transform", "rotate(-90)")
+    .attr("y", -margin.left+120)
+    .attr("x", -margin.top)
+    .text("average distance");
 
 
-// Draw the x and y axes
-const xAxis = d3.axisBottom(xScale);
-const yAxis = d3.axisLeft(yScale);
-scatterPlotSvg.append("g")
-.attr("transform", `translate(0, ${height - margin.bottom})`)
-.call(xAxis);
-scatterPlotSvg.append("g")
-.attr("transform", `translate(${margin.left}, 0)`)
-.call(yAxis);
 
-      const myColor = d3.scaleOrdinal()
+  const myColor = d3.scaleOrdinal()
       .domain(["Legal", "Illegal", "Six-Week Ban"])
       .range(["#7294b7", "#863233", "#d38889"]);
 // Draw the scatterplot circles
