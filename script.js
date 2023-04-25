@@ -15,7 +15,7 @@ d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
       .attr("width", width)
       .attr("height", height);
 
-  d3.csv("https://raw.githubusercontent.com/ecleff/interactive-abortion-access-dashboard/main/test.csv").then(function(data) {
+  d3.csv("data/all_yrs_counties.csv").then(function(data) {
  
     // create a map of legal status by county fips code
     var statusByFips = d3.rollup(data, 
@@ -196,12 +196,6 @@ function updateSecondGraph(filteredData, selectedValue) {
  } else {
 
   // If a specific legal status is selected, show the scatter plot
-// const filteredData = data.filter(d => selectedValue.includes(d.legal_status));
-  // Create a new SVG element to hold the scatterplot
-// const scatterPlot = d3.select("body")
-// .append("svg")
-// .attr("width", 800)
-// .attr("height", 600);
 
 // Create an array of objects for the scatterplot
 const scatterData = filteredData.map(d => {
@@ -280,6 +274,35 @@ scatterPlotSvg.selectAll("circle")
 .attr("cy", d => yScale(d.y))
 .attr("r", 3)
 .attr("fill", d => myColor(d.legal_status));
+
+// line graph for average distance
+const dataByYear = d3.group(filteredData, d => d.year);
+const meanData = Array.from(dataByYear, ([year, data]) => ({
+  year,
+  avg_distance: d3.mean(data, d => d.avg_distance)
+}));
+console.log(dataByYear)
+console.log(meanData)
+const lineDiv = d3.select("#line-chart")
+// Remove any existing scatter plot
+lineDiv.selectAll("*").remove();
+
+const linePlotWidth = 600;
+const linePlotHeight = 400;
+
+const lineSvg = lineDiv
+  .append("svg")
+  .attr("width", linePlotWidth)
+  .attr("height", linePlotHeight);
+
+  
+// Define the dimensions of the scatter plot
+// const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+
+// const width = scatterPlotWidth - margin.left - margin.right;
+// const height = scatterPlotHeight - margin.top - margin.bottom;
+
+// Define the x and y scales
 
 
  }
