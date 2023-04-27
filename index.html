@@ -2,43 +2,90 @@
   <meta charset="utf-8" />
     <script src="https://d3js.org/d3.v6.js"></script>
     <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
+   
 
     <link rel="stylesheet"  href="style.css">
     
 <script src="script.js"></script>
 <h1 class="title"> The State of Abortion Access in Post-Roe America</h1>
+<header>
+  
+  <div class="flex-container">
+    <div id="side1">
+  <div class="quote-box"><i>On June 24, 2022, the Supreme Court issued a ruling in Dobbs v. Jackson Women's Health Organization that overturned the constitutional right to abortion as well as the federal standards of abortion access, established by prior decisions in the cases Roe v. Wade and Planned Parenthood v. Casey. Prior to the Dobbs ruling, the federal standard was that abortions were permitted up to fetal viability. That federal standard has been eliminated, allowing states to set policies regarding the legality of abortions and establish limits. </i>
+    <div> <i><b>Access to and availability of abortions varies widely between states, with some states banning almost all abortions and some states protecting abortion access.</b></i></div>
+    <div>(Source: <a href="https://www.kff.org/womens-health-policy/report/key-facts-on-abortion-in-the-united-states/">Key Facts on Abortion in the United States, KFF)</a></div>
+  </div>
+</div>
+</div>
+  <!-- <img src="header.jpeg" alt="Header Image"> -->
+</header>
+
+
+<div class="flex-container">
 
 <body>
+  
+
+  <!-- line chart and selection box -->
+  <div id="side1">
+   
+    <div id="chart"></div>
  
-  <!-- <form id="filter-form">
-    <label>
-      <input type="checkbox" name="legal-status" value="Legal" checked>
-      Legal
-    </label>
-    <label>
-      <input type="checkbox" name="legal-status" value="Illegal" checked>
-      Illegal
-    </label>
-    <label>
-      <input type="checkbox" name="legal-status" value="Six-Week Ban" checked>
-      Six-Week Ban
-    </label>
-  </form> -->
+</div>
+
+<div id="side2">
+  <div class="main-text">This project seeks to visualize the disparity in abortion access across the United States. By highlighting the tangible ramifications of this public health crisis that affects everyone, not only people with uteruses, I hope to contribute to the body of work that stands for bodily autonomy and safe, accessible healthcare for all. </div>
+  <div class="main-text">Select an abortion legality status to learn more about how residents in those states have been affected by the federal abortion ban.</div>
   <label for="legal-status">Legal Status:</label>
   <select id="legal-status" name="legal-status">
     <option value="all" selected>All</option>
     <option value="Legal">Legal</option>
     <option value="Illegal">Illegal</option>
     <option value="Six-Week Ban">Six-Week Ban</option>
-  </select>
-  <!-- <div class="chart-container">
-    <div class="chart-div"></div>
-  </div> --> 
-  <div id="chart"></div>
-  <div id="scatter-plot-container"></div>
-  <div id="line-chart"></div>
-    <div class="tooltip"></div>
-   
+  </select> 
+
+  </div>
+
+  </div>
+</div>
+
+
+  <div class="flex-container">
+    <div id="side1">
+     
+
+<div id="text-box-container">
+  <div id="text-box"></div>
+</div>
+<div class="sub-heading">Average distance to nearest provider over time, 2009-2022</div>
+      <div id="line-chart"></div>
+      <div class="sub-heading">Average distance to nearest provider by state in 2022</div>
+      <div id="bar-chart"></div>
+      <div class="sub-heading">Average distance to nearest provider by county population in 2022</div>
+  <div id="scatter-plot-container"> <div class="tooltip"></div>
+</div>
+
+<div id="side2">
+<div class="main-text">Use slider to adjust population range</div>
+  <input type="range" name="mySlider" id=mySlider min="100" max="10000000" value="1000000" style="margin: -40; width: 500px"> 
+</div>
+  <!-- <div id="text-box"></div> -->
+
+ 
+ </div>
+
+
+
+</div>
+
+
+
+
+
 </body>
 
+<div class="main-text">Sources</div>
+<div class="main-text">Myers, C. K. (2023, January 11). <a href="https://osf.io/8dg7r/"> Myers Abortion Facility Database.</a> https://doi.org/10.17605/OSF.IO/8DG7R</div>
 
+<div class="main-text"> <a href="https://reproductiverights.org/maps/abortion-laws-by-state/">"After Roe Fell: Abortion Laws by State"</a>, Center for Reproductive Rights</div>
