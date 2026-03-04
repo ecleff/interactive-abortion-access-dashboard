@@ -14,7 +14,7 @@ d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
       .attr("height", height);
 
   d3.csv("all_yrs_counties.csv").then(function(data) {
- 
+ console.log(data);
     // create a map of legal status by county fips code
     var statusByFips = d3.rollup(data, 
       // v => v.legal_status, 
