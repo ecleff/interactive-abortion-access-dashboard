@@ -13,7 +13,7 @@ d3.json("https://d3js.org/us-10m.v1.json").then(function(us) {
       .attr("width", width)
       .attr("height", height);
 
-  d3.csv("all_yrs_counties.csv").then(function(data) {
+  d3.csv("https://raw.githubusercontent.com/ecleff/interactive-abortion-access-dashboard/refs/heads/main/all_yrs_counties.csv").then(function(data) {
  console.log(data);
     // create a map of legal status by county fips code
     var statusByFips = d3.rollup(data, 
