@@ -25,12 +25,13 @@ html {
 
 /* adjust typography defaults */
 body {
-  margin: 10px;
+  margin: 0 auto;
   font-family: "IBM Plex Sans";
   line-height: 1.5;
   background-color: #2B1212;
   color: white;
   font-weight: 300;
+  max-width: 900px;
   /* width: 950px; */
 }
 
